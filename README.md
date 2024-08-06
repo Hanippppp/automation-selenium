@@ -1,23 +1,21 @@
+# Saucedemo Automation Testing
 
-Berikut adalah template README yang dapat digunakan untuk proyek pengujian otomatis menggunakan Selenium pada situs web Saucedemo.com:
+This project demonstrates how to use Python, Selenium, and Chromedriver for automating the testing process on the [Saucedemo](https://www.saucedemo.com/) website. The tests include logging in, adding and removing items from the cart, and completing the checkout process.
 
-Saucedemo Automation Testing
-This project demonstrates how to use Python, Selenium, and Chromedriver for automating the testing process on the Saucedemo website. The tests include logging in, adding and removing items from the cart, and completing the checkout process.
+## Table of Contents
+- [Installation](#installation)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Tests Included](#tests-included)
+- [Contributing](#contributing)
+- [License](#license)
 
-Table of Contents
-Installation
-Usage
-Project Structure
-Tests Included
-Contributing
-License
-Installation
-Clone the repository:
+## Installation
 
-sh
-Copy code
-git clone https://github.com/yourusername/saucedemo-automation-testing.git
-cd saucedemo-automation-testing
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/yourusername/saucedemo-automation-testing.git
+   cd saucedemo-automation-testing
 Create a virtual environment and activate it:
 
 sh
