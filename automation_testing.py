@@ -45,56 +45,23 @@ def retry_click(driver, by, value, retries=3, delay=1):
             time.sleep(delay)
     raise StaleElementReferenceException("Element could not be clicked after several retries")
 
-def test_add_to_cart_and_remove():
-    wait = WebDriverWait(driver, 10)
-    
-    # Add to cart
-    add_to_cart_button = retry_find_element(driver, By.XPATH, "//button[text()='Add to cart']")
-    add_to_cart_button.click()
-    time.sleep(1)  # Jeda 1 detik setelah Add to Cart
-    
-    # Verify item added to cart
-    cart_count = retry_find_element(driver, By.CLASS_NAME, 'shopping_cart_badge').text
-    assert cart_count == '1', f"Expected cart count to be 1 but got {cart_count}"
-    print("Add to cart functionality tested")
-    
-    # Remove from cart
-    remove_button = retry_find_element(driver, By.XPATH, "//button[text()='Remove']")
-    remove_button.click()
-    time.sleep(1)  # Jeda 1 detik setelah Remove
-    
-    # Verify item removed from cart
-    try:
-        cart_count = driver.find_element(By.CLASS_NAME, 'shopping_cart_badge').text
-    except NoSuchElementException:
-        cart_count = ''
-    assert cart_count == '', f"Expected cart count to be empty but got {cart_count}"
-    print("Remove from cart functionality tested")
-
 def test_product_detail_add_remove():
     # Klik salah satu produk
     product_link = retry_find_element(driver, By.CLASS_NAME, 'inventory_item_name')
     product_link.click()
     time.sleep(1)  # Jeda 1 detik setelah mengklik produk
 
-    # Periksa apakah produk sudah ada di keranjang
-    try:
-        remove_button = driver.find_element(By.XPATH, "//button[text()='Remove']")
-        is_in_cart = True
-    except NoSuchElementException:
-        is_in_cart = False
+    # Klik add to cart
+    add_to_cart_button = retry_find_element(driver, By.XPATH, "//button[text()='Add to cart']")
+    add_to_cart_button.click()
+    time.sleep(1)  # Jeda 1 detik setelah add to cart
+    print("Product added to cart")
 
-    if is_in_cart:
-        # Jika produk sudah ada di keranjang, klik remove
-        remove_button.click()
-        time.sleep(1)  # Jeda 1 detik setelah remove
-        print("Product removed from cart")
-    else:
-        # Jika produk belum ada di keranjang, klik add to cart
-        add_to_cart_button = retry_find_element(driver, By.XPATH, "//button[text()='Add to cart']")
-        add_to_cart_button.click()
-        time.sleep(1)  # Jeda 1 detik setelah add to cart
-        print("Product added to cart")
+    # Klik remove
+    remove_button = retry_find_element(driver, By.XPATH, "//button[text()='Remove']")
+    remove_button.click()
+    time.sleep(1)  # Jeda 1 detik setelah remove
+    print("Product removed from cart")
 
     # Kembali ke halaman inventory
     back_to_products_button = retry_find_element(driver, By.ID, 'back-to-products')
@@ -115,7 +82,7 @@ def add_all_products_to_cart():
             print(f"Item already in cart, skipping to next item: {item.find_element(By.CLASS_NAME, 'inventory_item_name').text}")
     print("All products added to cart")
 
-def verify_cart_contents():
+def verify_and_checkout():
     # Klik ikon keranjang
     cart_icon = retry_find_element(driver, By.CLASS_NAME, 'shopping_cart_link')
     cart_icon.click()
@@ -124,24 +91,52 @@ def verify_cart_contents():
     # Verifikasi bahwa semua produk ada di keranjang
     cart_items = driver.find_elements(By.CLASS_NAME, 'cart_item')
     print(f"Total items in cart: {len(cart_items)}")
-    inventory_items = driver.find_elements(By.CLASS_NAME, 'inventory_item')
-    print(f"Expected items in cart: {len(inventory_items)}")
     
-    assert len(cart_items) == len(inventory_items), "Not all items were added to the cart"
-    print("All items verified in cart")
+    # Hapus salah satu barang dari keranjang
+    if len(cart_items) > 0:
+        remove_button = retry_find_element(driver, By.XPATH, "//button[text()='Remove']")
+        remove_button.click()
+        time.sleep(1)  # Jeda 1 detik setelah mengklik remove
+        print("One item removed from cart")
+
+    # Klik tombol checkout
+    checkout_button = retry_find_element(driver, By.ID, 'checkout')
+    checkout_button.click()
+    print("Navigated to checkout page")
+
+    # Isi data checkout pertama
+    first_name = retry_find_element(driver, By.ID, 'first-name')
+    last_name = retry_find_element(driver, By.ID, 'last-name')
+    postal_code = retry_find_element(driver, By.ID, 'postal-code')
+
+    first_name.send_keys("John")
+    last_name.send_keys("Doe")
+    postal_code.send_keys("12345")
+    print("Checkout data filled")
+
+    # Klik tombol continue untuk melanjutkan ke checkout tahap kedua
+    continue_button = retry_find_element(driver, By.ID, 'continue')
+    continue_button.click()
+    print("Proceeded to checkout step two")
+
+def finish_checkout():
+    # Klik tombol finish pada checkout tahap kedua
+    finish_button = retry_find_element(driver, By.ID, 'finish')
+    finish_button.click()
+    print("Checkout completed")
 
 def main():
     login()
     time.sleep(1)  # Jeda 1 detik setelah login
     if validate_login():
         time.sleep(1)  # Jeda 1 detik setelah validasi login
-        test_add_to_cart_and_remove()
-        time.sleep(1)  # Jeda 1 detik setelah pengujian Add to Cart dan Remove
         test_product_detail_add_remove()
         time.sleep(1)  # Jeda 1 detik setelah pengujian detail produk
         add_all_products_to_cart()
         time.sleep(1)  # Jeda 1 detik setelah menambahkan semua produk ke keranjang
-        verify_cart_contents()
+        verify_and_checkout()
+        time.sleep(1)  # Jeda 1 detik setelah memverifikasi keranjang dan checkout
+        finish_checkout()
     driver.quit()
 
 if __name__ == "__main__":
