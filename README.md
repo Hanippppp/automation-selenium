@@ -55,7 +55,3 @@ The tests include various operations such as:
 - Logging in to the website.
 - Adding and removing products from the cart.
 - Proceeding through the checkout process and completing the order.
-
-## Contact
-
-If you have any questions or suggestions, feel free to contact me at [email@example.com](mailto:email@example.com).
